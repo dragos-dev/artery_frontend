@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import Timer from "../utils/Timer";
 import toast from "react-hot-toast";
-import { useContractWrite, useWaitForTransaction } from "wagmi";
+import { useContractWrite } from "wagmi";
 import tokenABI from "@/public/abi/token.json";
 import { waitForTransaction } from "@wagmi/core";
 import { useBridge } from "@/hooks/useBridge";
@@ -43,11 +43,11 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
     const swap = async() => {
         const transaction = await writeAsync()
 
-        toast.custom("Транзакция отправлена. Ждем подтверждения.")
+        toast.custom("Транзакция отправлена. Ждите подтверждения.")
 
-        const result = await waitForTransaction({ hash: transaction.hash, timeout: 1000 * 60 * 30 })
+        // const result = await waitForTransaction({ hash: transaction.hash, timeout: 1000 * 60 * 30 })
 
-        if (result.status == 'success') toast.success("Транзакция успешно обработана.")
+        // if (result.status == 'success') toast.success("Транзакция успешно обработана.")
     }
 
     return <Modal 
