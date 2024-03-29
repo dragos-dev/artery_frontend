@@ -39,6 +39,7 @@ export default function Home() {
   const [swapAmountFrom, setSwapAmountFrom] = useState(0)
   const [swapAmountTo, setSwapAmountTo]  = useState(0)
 
+
   useEffect(() => {
     setSwapAmountTo(() => info?.commission !== undefined ? (swapAmountFrom > info.commission ? Number((swapAmountFrom - info.commission).toFixed(2)) : 0) : 0)
   }, [swapAmountFrom])
@@ -220,9 +221,9 @@ export default function Home() {
         </div>
       </div>
       <div className="flex flex-col gap-[11px]">
-          <span className="text-third">Created by <Link href="https://t.me/dragosdev" className="text-white text-[18px]">entire.team</Link></span>
+          <span className="text-third">Created by <Link href="https://t.me/devkid2" className="text-white text-[18px]">aqua</Link></span>
           <div className="flex justify-center gap-1">
-            <Link href="https://t.me/dragosdev" target="_blank" className="flex justify-center w-[40px] h-[40px] rounded-[16px] bg-secondary">
+            <Link href="https://t.me" target="_blank" className="flex justify-center w-[40px] h-[40px] rounded-[16px] bg-secondary">
               <Image src={TelegramIcon} alt="Telegram" />
             </Link>
             <Link href="https://twitter.com" target="_blank" className="flex justify-center w-[40px] h-[40px] rounded-[16px] bg-secondary">
