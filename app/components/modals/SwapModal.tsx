@@ -66,7 +66,7 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
           <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Write address for sending</ModalHeader>
           <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
             <div className="flex flex-col gap-[12px] max-w-full">
-                <span className="text-wrap">Отправьте сумму <span className="text-[22px] font-semibold">{info?.activeBridge?.amount ?? amount} {chains[selectedChains.from].token}</span> на адрес кошелька Artery</span>
+                <span className="text-wrap text-center">Отправьте сумму <span className="text-[22px] font-semibold">{info?.activeBridge?.amount ?? amount} {chains[selectedChains.from].token}</span> на адрес кошелька Artery</span>
                 {loading ? <Skeleton className="rounded-lg bg-secondary before:opacity-10 w-[20%] ml-auto">
                     <div className="h-[24px] rounded-lg max-w-full"></div>
                 </Skeleton> : <span className="text-[14px] text-right">осталось <span className="text-[18px] font-semibold"><Timer timestamp={1711738711} timeTo={1720000000} /></span></span>}
