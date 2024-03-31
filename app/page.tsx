@@ -22,6 +22,7 @@ import { authenticatedStatusAtom, infoAtom, selectedChainsStatusAtom } from "@/l
 import ChainsModal from "./components/modals/ChainModal";
 import SwapModal from "./components/modals/SwapModal";
 import { useMe } from "@/hooks/useMe";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
@@ -186,7 +187,7 @@ export default function Home() {
                            if ((!isConnected || localStorage.getItem('token')) && openConnectModal) {
                             openConnectModal()
                           } else {
-                            if (swapAmountTo > 0) setSwapModalOpen(() => true)
+                            swapAmountFrom < 5000 ? toast.error("Минимальная сумма бриджа - 5000") : setSwapModalOpen(() => true)
                           }
                         }}>
                           {(authenticated == 'loading' || authenticated === null) ? <CircularProgress color="default" aria-label="Loading..." /> : authenticated =='authenticated' ? "Swap" : "Connect Wallet"}
@@ -220,8 +221,8 @@ export default function Home() {
             </Button>
         </div>
       </div>
-      <div className="flex flex-col gap-[11px]">
-          <span className="text-third">Created by <Link href="https://t.me/devkid2" className="text-white text-[18px]">aqua</Link></span>
+      <div className="flex flex-col items-center gap-[11px]">
+          <span className="text-third">Created by <Link href="https://t.me/devkid2" target="_blank" className="text-white text-[18px]">aqua</Link></span>
           <div className="flex justify-center gap-1">
             <Link href="https://t.me" target="_blank" className="flex justify-center w-[40px] h-[40px] rounded-[16px] bg-secondary">
               <Image src={TelegramIcon} alt="Telegram" />

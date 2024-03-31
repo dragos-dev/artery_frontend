@@ -2,9 +2,8 @@ import { chains } from "@/app/chains";
 import { infoAtom, selectedChainsStatusAtom } from "@/lib/atom";
 import {$api} from "@/lib/axios";
 import { Info, RequestBridge } from "@/lib/types";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import { useAtom } from "jotai";
-import { useMutation } from "wagmi";
 
 export const useBridge = () => {
     const [, setInfo] = useAtom(infoAtom)
@@ -32,7 +31,8 @@ export const useBridge = () => {
                     activeBridge: {
                         id: res.id,
                         depositAddress: res.depositAddress,
-                        timeForOut: new Date().getTime() + 1000 * 60 * 30,
+                        timeForOut: 1000 * 60 * 30,
+                        timeForEnd: new Date().getTime() + 1000 * 60 * 30,
                         amount: res.amount
                     }
                 }))

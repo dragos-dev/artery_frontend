@@ -3,7 +3,7 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
 import React, { useState } from "react";
-import { bsc } from "wagmi/chains";
+import { bsc, sepolia } from "wagmi/chains";
 import {
 	connectorsForWallets,
 	RainbowKitAuthenticationProvider,
@@ -18,7 +18,7 @@ import { $api } from '@/lib/axios';
 import { useAtom } from 'jotai';
 import { authenticatedStatusAtom } from '@/lib/atom';
 
-const { chains, publicClient } = configureChains([bsc], [publicProvider()]);
+const { chains, publicClient } = configureChains([sepolia], [publicProvider()]);
 
 const projectId = 'dc0f9c2e5311b53b1e1533036868b684'
 
@@ -90,7 +90,7 @@ export const WagmiProvider = ({ children }: { children: React.ReactNode }) => {
 						adapter={authenticationAdapter}
 						status={authenticated ?? 'unauthenticated'}
 						>
-				<RainbowKitProvider chains={chains} initialChain={bsc}>
+				<RainbowKitProvider chains={chains} initialChain={sepolia}>
 					{children}
 				</RainbowKitProvider>
 			</RainbowKitAuthenticationProvider>

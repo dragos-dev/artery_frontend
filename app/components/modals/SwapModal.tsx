@@ -9,6 +9,8 @@ import { useContractWrite } from "wagmi";
 import tokenABI from "@/public/abi/token.json";
 import { waitForTransaction } from "@wagmi/core";
 import { useBridge } from "@/hooks/useBridge";
+import { useMe } from "@/hooks/useMe";
+import { useCheck } from "@/hooks/useCheck";
 
 interface ISwapModalProps {
     open: boolean;
@@ -20,6 +22,7 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
     const [info] = useAtom(infoAtom)
+    const {refetch} = useMe()
     const [loading, setLoading] = useState(true)
     const addressToDeposit = "0x7ECBaf84d675e0986cB3425716A194A7232dFC09"
     const {writeAsync} = useContractWrite({
@@ -29,25 +32,53 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
         args: [addressToDeposit, (info?.activeBridge?.amount ?? amount) * 1_000_000]
     })
     const {mutate} = useBridge()
+    const {data: checkData, mutate: sendCheck} = useCheck()
+    const [bridging, setBridging] = useState(false)
+    const [toAddress, setToAddress] = useState("")
 
     useEffect(() => {
-        if (open) // onOpen()
+        if (open) onOpen()
         if (!isOpen) setOpen(() => false)
     }, [open, isOpen])
 
     useEffect(() => {
-        if (!info?.activeBridge) mutate(amount)
+        console.log(!info?.activeBridge, amount > 0)
+        if (info?.activeBridge) setBridging(() => true)
+        if (!info?.activeBridge && !bridging && amount > 0) {
+            setBridging(() => true)
+            mutate(amount)
+            refetch()
+        }
         setLoading(() => false)
-    }, [info])
+    }, [info, open, bridging])
 
-    const swap = async() => {
-        const transaction = await writeAsync()
+    const send = async() => {
+        try {
+            const transaction = await writeAsync()
 
-        toast.custom("Транзакция отправлена. Ждите подтверждения.")
+            toast.success("Транзакция отправлена. Ждите подтверждения.")
+        } catch (e) {
+            toast.error("Error")
+        }
 
         // const result = await waitForTransaction({ hash: transaction.hash, timeout: 1000 * 60 * 30 })
 
         // if (result.status == 'success') toast.success("Транзакция успешно обработана.")
+    }
+    
+    const check = () => {
+        if (!info?.activeBridge?.id) return
+
+        sendCheck({ bridge_id: info.activeBridge.id, to_address: toAddress })
+
+        if (checkData?.exists) {
+            if (checkData?.confirmed) {
+                toast.success("Успешно переведено.")
+                setOpen(() => false)
+            } else {
+                toast.error("Еще не поступило переводов, ожидайте.")
+            }
+        } else setOpen(() => false)
     }
 
     return <Modal 
@@ -67,13 +98,15 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
           <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
             <div className="flex flex-col gap-[12px] max-w-full">
                 <span className="text-wrap text-center">Отправьте сумму <span className="text-[22px] font-semibold">{info?.activeBridge?.amount ?? amount} {chains[selectedChains.from].token}</span> на адрес кошелька Artery</span>
+                {info?.activeBridge?.timeForOut && info?.activeBridge?.timeForEnd ? <>
                 {loading ? <Skeleton className="rounded-lg bg-secondary before:opacity-10 w-[20%] ml-auto">
                     <div className="h-[24px] rounded-lg max-w-full"></div>
-                </Skeleton> : <span className="text-[14px] text-right">осталось <span className="text-[18px] font-semibold"><Timer timestamp={1711738711} timeTo={1720000000} /></span></span>}
+                </Skeleton> : <span className="text-[14px] text-right">осталось <span className="text-[18px] font-semibold"><Timer timestamp={info.activeBridge.timeForEnd - info.activeBridge.timeForOut} timeTo={info.activeBridge.timeForEnd} /></span></span>}
                 {loading ? <Skeleton className="rounded-lg bg-secondary before:opacity-10">
                     <div className="h-[12px] rounded-lg max-w-full"></div>
                 </Skeleton> : 
-                <Progress aria-label="Loading..." value={60} classNames={{ indicator: 'bg-white', track: 'bg-secondary' }} className="max-w-full"/>}
+                <Progress aria-label="Loading..." value={(30 - info.activeBridge.timeForOut / (1000 * 60)) / 30 * 100} classNames={{ indicator: 'bg-white', track: 'bg-secondary' }} className="max-w-full"/>}
+                </> : null}
                 {loading ? <Skeleton className="rounded-lg bg-secondary before:opacity-10 w-[50%] mx-auto">
                     <div className="h-[54px] rounded-lg max-w-full"></div>
                 </Skeleton> : <div className="flex justify-center mx-auto place-items-center max-w-full bg-secondary h-[54px] rounded-2xl px-2">
@@ -87,16 +120,16 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
                 </div>}
             </div>
             <div className="flex flex-col gap-9">
-                <Input type="text" label="Введите адрес на который отправить токены" classNames={{
+                <Input type="text" label="Введите адрес на который отправить токены" value={toAddress} onChange={e => setToAddress(() => e.target.value)} classNames={{
                     inputWrapper: "h-[102px] bg-secondary data-[hover=true]:bg-secondary group-data-[focus=true]:bg-secondary",
                     label: "text-[14px] font-medium text-third pb-[5px]",
                     input: "text-[36px] font-medium !text-white"
                 }} />
                 <div className="w-full flex flex-col gap-4">
-                    <Button className="h-[74px] bg-white w-full font-medium text-[18px]">
+                    <Button className="h-[74px] bg-white w-full font-medium text-[18px]" onClick={check}>
                         Check payment
                     </Button>
-                    {evmChains.includes(chains[selectedChains.from].network) ? <Button onClick={swap} className="h-[74px] bg-secondary text-white w-full font-medium text-[18px]">
+                    {evmChains.includes(chains[selectedChains.from].network) ? <Button onClick={send} className="h-[74px] bg-secondary text-white w-full font-medium text-[18px]">
                         Send
                     </Button> : null}
                 </div>

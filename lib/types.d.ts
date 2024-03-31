@@ -20,6 +20,7 @@ export type Chain = {
 interface ActibeBridge {
     id: number;
     timeForOut: number;
+    timeForEnd: number;
     depositAddress: string;
     amount: number;
 }
@@ -34,4 +35,9 @@ export interface RequestBridge {
     id: number;
     depositAddress: string;
     amount: number;
+}
+
+export interface RequestCheck {
+    exists: boolean;
+    confirmed: boolean;
 }
