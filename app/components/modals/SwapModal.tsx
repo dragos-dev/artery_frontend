@@ -11,6 +11,7 @@ import { waitForTransaction } from "@wagmi/core";
 import { useBridge } from "@/hooks/useBridge";
 import { useMe } from "@/hooks/useMe";
 import { useCheck } from "@/hooks/useCheck";
+import { CONTRACT_ADDRESS } from "@/lib/data";
 
 interface ISwapModalProps {
     open: boolean;
@@ -24,12 +25,10 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
     const [info] = useAtom(infoAtom)
     const {refetch} = useMe()
     const [loading, setLoading] = useState(true)
-    const addressToDeposit = "0x7ECBaf84d675e0986cB3425716A194A7232dFC09"
     const {writeAsync} = useContractWrite({
-        address: "0x7ECBaf84d675e0986cB3425716A194A7232dFC09",
+        address: CONTRACT_ADDRESS,
         abi: tokenABI,
-        functionName: 'transfer',
-        args: [addressToDeposit, (info?.activeBridge?.amount ?? amount) * 1_000_000]
+        functionName: 'transfer'
     })
     const {mutate} = useBridge()
     const {data: checkData, mutate: sendCheck} = useCheck()
@@ -44,6 +43,7 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
     useEffect(() => {
         console.log(!info?.activeBridge, amount > 0)
         if (info?.activeBridge) setBridging(() => true)
+        console.log(info?.activeBridge, bridging, amount)
         if (!info?.activeBridge && !bridging && amount > 0) {
             setBridging(() => true)
             mutate(amount)
@@ -54,7 +54,7 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
 
     const send = async() => {
         try {
-            const transaction = await writeAsync()
+            const transaction = await writeAsync({ args: [info?.activeBridge?.depositAddress, (info?.activeBridge?.amount ?? amount) * 1e18] })
 
             toast.success("Транзакция отправлена. Ждите подтверждения.")
         } catch (e) {
@@ -110,9 +110,9 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
                 {loading ? <Skeleton className="rounded-lg bg-secondary before:opacity-10 w-[50%] mx-auto">
                     <div className="h-[54px] rounded-lg max-w-full"></div>
                 </Skeleton> : <div className="flex justify-center mx-auto place-items-center max-w-full bg-secondary h-[54px] rounded-2xl px-2">
-                    <span className="truncate px-3">{addressToDeposit}</span>
+                    <span className="truncate px-3">{info?.activeBridge?.depositAddress}</span>
                     <Button className="bg-white px-0 min-w-[40px]" onClick={() => {
-                        window.navigator.clipboard.writeText(addressToDeposit)
+                        window.navigator.clipboard.writeText(info?.activeBridge?.depositAddress ?? "")
                         toast.success("Скопировано")
                     }}>
                         📄

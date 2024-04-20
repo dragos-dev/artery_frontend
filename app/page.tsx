@@ -187,7 +187,7 @@ export default function Home() {
                            if ((!isConnected || localStorage.getItem('token')) && openConnectModal) {
                             openConnectModal()
                           } else {
-                            swapAmountFrom < 5000 ? toast.error("Минимальная сумма бриджа - 5000") : setSwapModalOpen(() => true)
+                            swapAmountFrom < 1000 ? toast.error("Минимальная сумма бриджа - 5000") : setSwapModalOpen(() => true)
                           }
                         }}>
                           {(authenticated == 'loading' || authenticated === null) ? <CircularProgress color="default" aria-label="Loading..." /> : authenticated =='authenticated' ? "Swap" : "Connect Wallet"}
