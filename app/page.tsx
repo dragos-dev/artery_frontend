@@ -23,6 +23,8 @@ import ChainsModal from "./components/modals/ChainModal";
 import SwapModal from "./components/modals/SwapModal";
 import { useMe } from "@/hooks/useMe";
 import toast from "react-hot-toast";
+import { MIN_BRIDGE_SUM } from "@/lib/data";
+import { useBridge } from "@/hooks/useBridge";
 
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
@@ -36,6 +38,7 @@ export default function Home() {
   const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
   const [selectingChain, setSelectingChain] = useState<"none" | "from" | "to">("none")
   const [info] = useAtom(infoAtom)
+  const {mutate} = useBridge()
 
   const [swapAmountFrom, setSwapAmountFrom] = useState(0)
   const [swapAmountTo, setSwapAmountTo]  = useState(0)
@@ -187,7 +190,12 @@ export default function Home() {
                            if ((!isConnected || localStorage.getItem('token')) && openConnectModal) {
                             openConnectModal()
                           } else {
-                            swapAmountFrom < 1000 ? toast.error("Минимальная сумма бриджа - 5000") : setSwapModalOpen(() => true)
+                            if (swapAmountFrom < MIN_BRIDGE_SUM) {
+                              toast.error(`Минимальная сумма бриджа - ${MIN_BRIDGE_SUM}`) 
+                            } else {
+                              mutate(swapAmountFrom)
+                              setSwapModalOpen(() => true)
+                            }
                           }
                         }}>
                           {(authenticated == 'loading' || authenticated === null) ? <CircularProgress color="default" aria-label="Loading..." /> : authenticated =='authenticated' ? "Swap" : "Connect Wallet"}

@@ -12,6 +12,7 @@ import { useBridge } from "@/hooks/useBridge";
 import { useMe } from "@/hooks/useMe";
 import { useCheck } from "@/hooks/useCheck";
 import { CONTRACT_ADDRESS } from "@/lib/data";
+import { Chains } from "@/lib/types";
 
 interface ISwapModalProps {
     open: boolean;
@@ -20,7 +21,7 @@ interface ISwapModalProps {
 }
 
 const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
     const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
     const [info] = useAtom(infoAtom)
     const {refetch} = useMe()
@@ -30,7 +31,6 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
         abi: tokenABI,
         functionName: 'transfer'
     })
-    const {mutate} = useBridge()
     const {data: checkData, mutate: sendCheck} = useCheck()
     const [bridging, setBridging] = useState(false)
     const [toAddress, setToAddress] = useState("")
@@ -42,12 +42,15 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
 
     useEffect(() => {
         console.log(!info?.activeBridge, amount > 0)
-        if (info?.activeBridge) setBridging(() => true)
-        console.log(info?.activeBridge, bridging, amount)
-        if (!info?.activeBridge && !bridging && amount > 0) {
-            setBridging(() => true)
-            mutate(amount)
-            refetch()
+        // if (info?.activeBridge) setBridging(() => true)
+        // console.log(info?.activeBridge, bridging, amount)
+        // if (!info?.activeBridge && !bridging && amount > 0) {
+        //     setBridging(() => true)
+        //     refetch()
+        // }
+        if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0) {
+            toast.error("Время истекло")
+            setOpen(() => false)
         }
         setLoading(() => false)
     }, [info, open, bridging])
@@ -70,16 +73,16 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
         if (!info?.activeBridge?.id) return
 
         sendCheck({ bridge_id: info.activeBridge.id, to_address: toAddress })
-
-        if (checkData?.exists) {
-            if (checkData?.confirmed) {
-                toast.success("Успешно переведено.")
-                setOpen(() => false)
-            } else {
-                toast.error("Еще не поступило переводов, ожидайте.")
-            }
-        } else setOpen(() => false)
     }
+
+    useEffect(() => {
+        if (checkData?.exists && checkData?.confirmed) {
+            toast.success("Успешно переведено.")
+            onClose()
+        } else {
+            toast.error("Еще не поступило переводов, ожидайте.")
+        }
+    }, [checkData])
 
     return <Modal 
     isOpen={isOpen} 

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npx patch-package"
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.10",
@@ -24,7 +25,9 @@
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "siwe": "^2.1.4",
-    "wagmi": "1.4.8"
+    "wagmi": "1.4.8",
+    "dem-api": "git+https://github.com/arterynetwork/dem-api.git#semver:1.0.0",
+    "patch-package": "^7.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",
