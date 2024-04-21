@@ -29,8 +29,9 @@ import { useBridge } from "@/hooks/useBridge";
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
 
-  const [chainsModalOpen, setChainsModalOpen] = useState(false)
-  const [swapModalOpen, setSwapModalOpen] = useState(false)
+  const chainsModalOpen = useDisclosure()
+  const swapModalOpen = useDisclosure()
+
   const [selected, setSelected] = React.useState("transfer");
   const { isConnected, address } = useAccount();
   const { openConnectModal } = useConnectModal();
@@ -51,7 +52,7 @@ export default function Home() {
   useEffect(() => {console.log(selectedChains)}, [authenticated, selectedChains.from, selectedChains.to])
 
   useEffect(() => {
-    if (info?.activeBridge) setSwapModalOpen(() => true)
+    if (info?.activeBridge) swapModalOpen.onOpen()
   }, [info])
 
   const onSwitch = () => {
@@ -65,8 +66,8 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 gap-4 sm:gap-10">
-      <ChainsModal open={chainsModalOpen} setOpen={setChainsModalOpen} onSwitch={onSwitch} selectingChain={selectingChain} setSelectingChain={setSelectingChain} />
-      <SwapModal open={swapModalOpen} setOpen={setSwapModalOpen} amount={swapAmountFrom} />
+      <ChainsModal open={chainsModalOpen.isOpen} onClose={chainsModalOpen.onClose} onSwitch={onSwitch} selectingChain={selectingChain} setSelectingChain={setSelectingChain} />
+      <SwapModal open={swapModalOpen.isOpen} onClose={swapModalOpen.onClose} amount={swapAmountFrom} />
 
       <div className="display flex gap-4">
         <Image src={NotificationIcon} alt="Notification" />
@@ -99,7 +100,7 @@ export default function Home() {
                             </span>
                             <Button onClick={() => {
                               setSelectingChain(() => "from")
-                              setChainsModalOpen(() => true)
+                              chainsModalOpen.onOpen()
                             }} className="flex place-items-center font-medium text-[16px] gap-[25px] text-white bg-secondary p-6">
                               <div className="flex gap-[10px]">
                                 <div className="bg-white rounded-full w-[20px] h-[20px]">
@@ -151,7 +152,7 @@ export default function Home() {
                               </span>
                               <Button onClick={() => {
                                 setSelectingChain(() => "to")
-                                setChainsModalOpen(() => true)
+                                chainsModalOpen.onOpen()
                               }} className="flex place-items-center font-medium text-[16px] gap-[25px] text-white bg-secondary p-6">
                                 <div className="flex gap-[10px]">
                                   <div className="bg-white rounded-full w-[20px] h-[20px]">
@@ -194,7 +195,7 @@ export default function Home() {
                               toast.error(`Минимальная сумма бриджа - ${MIN_BRIDGE_SUM}`) 
                             } else {
                               mutate(swapAmountFrom)
-                              setSwapModalOpen(() => true)
+                              swapModalOpen.onOpen()
                             }
                           }
                         }}>

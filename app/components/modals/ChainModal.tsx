@@ -7,32 +7,26 @@ import { selectedChainsStatusAtom } from "@/lib/atom";
 
 interface IChainsModalProps {
     open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onClose: () => void;
     onSwitch: () => void;
     selectingChain: "from" | "to" | "none";
     setSelectingChain: React.Dispatch<React.SetStateAction<"none" | "from" | "to">>;
 }
 
-const ChainsModal = ({ open, setOpen, onSwitch, selectingChain, setSelectingChain }: IChainsModalProps) => {
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+const ChainsModal = ({ open, onClose, onSwitch, selectingChain, setSelectingChain }: IChainsModalProps) => {
     const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
 
-    useEffect(() => {
-        if (open) onOpen()
-        if (!isOpen) setOpen(() => false)
-    }, [open, isOpen])
-
     return <Modal 
-    isOpen={isOpen} 
-    placement={"bottom-center"}
-    classNames={{
-      closeButton: "hidden sm:block z-[1]"
-    }}
-    className="bg-primary rounded-b-none m-0 sm:rounded-b-2xl overflow-visible"
-    onOpenChange={onOpenChange} 
-  >
+      isOpen={open} 
+      placement={"bottom-center"}
+      classNames={{
+        closeButton: "hidden sm:block z-[1]"
+      }}
+      className="bg-primary rounded-b-none m-0 sm:rounded-b-2xl overflow-visible"
+      onOpenChange={onClose}
+    >
     <ModalContent>
-      {(onClose) => (
+      {() => (
         <div className="relative">
           <div className="sm:hidden absolute left-0 right-0 mx-auto top-[-14px] w-[40px] h-[6px] bg-white rounded-[4px]"></div>
           <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Select source chain</ModalHeader>

@@ -13,15 +13,16 @@ import { useMe } from "@/hooks/useMe";
 import { useCheck } from "@/hooks/useCheck";
 import { CONTRACT_ADDRESS } from "@/lib/data";
 import { Chains } from "@/lib/types";
+import axios from "axios";
+import { $api } from "@/lib/axios";
 
 interface ISwapModalProps {
     open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onClose: () => void;
     amount: number;
 }
 
-const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
-    const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
     const [info] = useAtom(infoAtom)
     const {refetch} = useMe()
@@ -36,21 +37,9 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
     const [toAddress, setToAddress] = useState("")
 
     useEffect(() => {
-        if (open) onOpen()
-        if (!isOpen) setOpen(() => false)
-    }, [open, isOpen])
-
-    useEffect(() => {
-        console.log(!info?.activeBridge, amount > 0)
-        // if (info?.activeBridge) setBridging(() => true)
-        // console.log(info?.activeBridge, bridging, amount)
-        // if (!info?.activeBridge && !bridging && amount > 0) {
-        //     setBridging(() => true)
-        //     refetch()
-        // }
         if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0) {
             toast.error("Время истекло")
-            setOpen(() => false)
+            onClose()
         }
         setLoading(() => false)
     }, [info, open, bridging])
@@ -75,26 +64,43 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
         sendCheck({ bridge_id: info.activeBridge.id, to_address: toAddress })
     }
 
-    useEffect(() => {
-        if (checkData?.exists && checkData?.confirmed) {
-            toast.success("Успешно переведено.")
+    const cancel = async() => {
+        if (!info?.activeBridge?.id) return
+
+        const res = (await $api.delete("/bridge", { params: { id: info.activeBridge.id } })).data
+
+        if (res) {
+            toast.error("Swap отменен.")
             onClose()
-        } else {
-            toast.error("Еще не поступило переводов, ожидайте.")
+        }
+    }
+
+    useEffect(() => {
+        if (open) {
+            if (checkData?.exists && checkData?.confirmed) {
+                toast.success("Успешно переведено.")
+                onClose()
+            } else {
+                toast.error("Еще не поступило переводов, ожидайте.")
+            }
         }
     }, [checkData])
 
     return <Modal 
-    isOpen={isOpen} 
-    placement={"bottom-center"}
-    classNames={{
-      closeButton: "hidden sm:block z-[1]",
-    }}
-    className="bg-primary rounded-b-none m-0 sm:rounded-b-2xl max-w-[793px] min-h-[446px] overflow-visible"
-    onOpenChange={onOpenChange} 
-  >
+        isOpen={open} 
+        placement={"bottom-center"}
+        classNames={{
+        closeButton: "hidden sm:block z-[1]",
+        }}
+        hideCloseButton
+        className="bg-primary rounded-b-none m-0 sm:rounded-b-2xl max-w-[793px] min-h-[446px] overflow-visible"
+        onOpenChange={() => {
+            console.log("open change", open)
+            onClose()
+        }}
+    >
     <ModalContent>
-      {(onClose) => (
+      {() => (
         <div className="relative">
           <div className="sm:hidden absolute left-0 right-0 mx-auto top-[-14px] w-[40px] h-[6px] bg-white rounded-[4px]"></div>
           <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Write address for sending</ModalHeader>
@@ -122,7 +128,12 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
                     </Button>
                 </div>}
             </div>
-            <div className="flex flex-col gap-9">
+            <div className="flex flex-col gap-4">
+                {evmChains.includes(chains[selectedChains.from].network) ? <div className="w-full flex flex-col gap-4">
+                    <Button onClick={send} className="h-[74px] bg-secondary text-white w-full font-medium text-[18px]">
+                            Send
+                    </Button>
+                </div> : null}
                 <Input type="text" label="Введите адрес на который отправить токены" value={toAddress} onChange={e => setToAddress(() => e.target.value)} classNames={{
                     inputWrapper: "h-[102px] bg-secondary data-[hover=true]:bg-secondary group-data-[focus=true]:bg-secondary",
                     label: "text-[14px] font-medium text-third pb-[5px]",
@@ -132,9 +143,9 @@ const SwapModal = ({ open, setOpen, amount }: ISwapModalProps) => {
                     <Button className="h-[74px] bg-white w-full font-medium text-[18px]" onClick={check}>
                         Check payment
                     </Button>
-                    {evmChains.includes(chains[selectedChains.from].network) ? <Button onClick={send} className="h-[74px] bg-secondary text-white w-full font-medium text-[18px]">
-                        Send
-                    </Button> : null}
+                    <Button onClick={cancel} className="h-[74px] bg-secondary text-red-500 w-full font-medium text-[18px]">
+                        Cancel
+                    </Button>
                 </div>
             </div>
           </ModalBody>
