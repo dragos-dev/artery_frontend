@@ -17,17 +17,18 @@
     "@wagmi/core": "^2.6.13",
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
+    "dem-api": "git+https://github.com/arterynetwork/dem-api.git#semver:1.0.0",
     "ethers": "^6.11.1",
     "framer-motion": "^11.0.22",
     "jotai": "^2.7.2",
     "next": "14.1.4",
+    "patch-package": "^7.0.2",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "siwe": "^2.1.4",
-    "wagmi": "1.4.8",
-    "dem-api": "git+https://github.com/arterynetwork/dem-api.git#semver:1.0.0",
-    "patch-package": "^7.0.2"
+    "view": "^1.1.1",
+    "wagmi": "1.4.8"
   },
   "devDependencies": {
     "@types/node": "^20",

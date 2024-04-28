@@ -14,8 +14,8 @@ import TelegramIcon from "@/public/telegram.svg"
 import TwitterIcon from "@/public/twitter.svg"
 import InstagramIcon from "@/public/instagram.svg"
 import GithubIcon from "@/public/github.svg"
-import { chains } from "./chains";
-import { useAccount } from "wagmi";
+import { chains, evmChains } from "./chains";
+import { useAccount, useContractRead } from "wagmi";
 import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAtom } from "jotai";
 import { authenticatedStatusAtom, infoAtom, selectedChainsStatusAtom } from "@/lib/atom";
@@ -23,8 +23,9 @@ import ChainsModal from "./components/modals/ChainModal";
 import SwapModal from "./components/modals/SwapModal";
 import { useMe } from "@/hooks/useMe";
 import toast from "react-hot-toast";
-import { MIN_BRIDGE_SUM } from "@/lib/data";
+import { CONTRACT_ADDRESS, MIN_BRIDGE_SUM } from "@/lib/data";
 import { useBridge } from "@/hooks/useBridge";
+import * as abi from "@/public/abi/token.json"
 
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
@@ -41,9 +42,20 @@ export default function Home() {
   const [info] = useAtom(infoAtom)
   const {mutate} = useBridge()
 
+  const {data: balance} = useContractRead({
+    abi,
+    functionName: 'balanceOf',
+    args: [address]
+  })
+
   const [swapAmountFrom, setSwapAmountFrom] = useState(0)
   const [swapAmountTo, setSwapAmountTo]  = useState(0)
 
+  const [userBalance, setUserBalance] = useState("")
+
+  useEffect(() => {
+    if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setUserBalance((Number(userBalance) / 1e18).toFixed(2))
+  }, [address, balance, selectedChains?.from])
 
   useEffect(() => {
     setSwapAmountTo(() => info?.commission !== undefined ? (swapAmountFrom > info.commission ? Number((swapAmountFrom - info.commission).toFixed(2)) : 0) : 0)
@@ -62,6 +74,29 @@ export default function Home() {
     if (isNaN(lastSelectedChainFrom) || isNaN(lastSelectedChainTo)) return
 
     setSelectedChains(() => ({ from: lastSelectedChainTo, to: lastSelectedChainFrom }))
+  }
+
+  const addToken = async() => {
+    const tokenSymbol = 'WARTR';
+    const tokenDecimals = 18;
+    
+    if (!('ethereum' in window)) return
+
+    try {
+      const wasAdded = await (window.ethereum as any).request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: CONTRACT_ADDRESS, 
+            symbol: tokenSymbol, 
+            decimals: tokenDecimals, 
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -93,6 +128,10 @@ export default function Home() {
                 <Tab key="transfer" title="Transfer">
                   <Card className="max-w-full bg-transparent lg:bg-primary w-full lg:w-[545px] min-h-[400px]">
                     <CardBody className="flex flex-col items-center text-white overflow-hidden gap-5 min-h-full p-6">
+                        <Button className="w-full bg-secondary font-medium text-white text-[18px] p-10" onClick={addToken}>
+                          Add WARTR Token
+                        </Button>
+
                         <div className="flex flex-col gap-2 w-full">
                           <div className="flex items-center gap-5">
                             <span>
@@ -132,7 +171,7 @@ export default function Home() {
                               endContent={
                                 <div className="relative w-[70px] pointer-events-none flex items-center justify-end">
                                   <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ?? "..."}</span>
-                                  <span className="text-white text-small">{chains[selectedChains.from].token}</span>
+                                  <span className="text-white text-small">{userBalance ? `${userBalance} ` : ``}{chains[selectedChains.from].token}</span>
                                 </div>
                               }
                             />

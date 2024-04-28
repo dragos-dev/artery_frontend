@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import Timer from "../utils/Timer";
 import toast from "react-hot-toast";
-import { useContractWrite } from "wagmi";
+import { useAccount, useContractWrite } from "wagmi";
 import tokenABI from "@/public/abi/token.json";
 import { waitForTransaction } from "@wagmi/core";
 import { useBridge } from "@/hooks/useBridge";
@@ -35,6 +35,11 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const {data: checkData, mutate: sendCheck} = useCheck()
     const [bridging, setBridging] = useState(false)
     const [toAddress, setToAddress] = useState("")
+    const { address } = useAccount()
+
+    useEffect(() => {
+        if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setToAddress(() => address as `0x${string}`)
+    }, [address])
 
     useEffect(() => {
         if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0) {
