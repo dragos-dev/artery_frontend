@@ -90,7 +90,7 @@ export const WagmiProvider = ({ children }: { children: React.ReactNode }) => {
 						adapter={authenticationAdapter}
 						status={authenticated ?? 'unauthenticated'}
 						>
-				<RainbowKitProvider chains={chains} initialChain={sepolia}>
+				<RainbowKitProvider chains={chains} initialChain={bsc}>
 					{children}
 				</RainbowKitProvider>
 			</RainbowKitAuthenticationProvider>
