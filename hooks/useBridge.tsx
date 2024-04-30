@@ -33,8 +33,9 @@ export const useBridge = () => {
                         depositAddress: res.depositAddress,
                         timeForOut: 1000 * 60 * 30,
                         timeForEnd: new Date().getTime() + 1000 * 60 * 30,
-                        amount: res.amount
-                    }
+                        amount: res.amount,
+                    },
+                    feePerTransfer: prev?.feePerTransfer ?? 0
                 }))
                 console.log("Request bridge response", res);
             }
