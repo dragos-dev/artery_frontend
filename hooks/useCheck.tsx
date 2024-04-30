@@ -25,7 +25,8 @@ export const useCheck = () => {
                     setInfo(prev => ({
                         maxAmount: prev?.maxAmount ?? 0,
                         commission: prev?.commission ?? 0,
-                        activeBridge: undefined
+                        activeBridge: undefined,
+                        feePerTransfer: prev?.feePerTransfer ?? 0
                     }))
                 console.log("Request check response", res);
             }
