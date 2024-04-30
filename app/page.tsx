@@ -44,7 +44,7 @@ export default function Home() {
   const [info] = useAtom(infoAtom)
   const {mutate, isError, isSuccess} = useBridge()
 
-  const {data: balance} = useContractRead({
+  const {data: balance, refetch} = useContractRead({
     abi,
     functionName: 'balanceOf',
     args: [address]
@@ -64,7 +64,8 @@ export default function Home() {
   const [userBalance, setUserBalance] = useState("")
 
   useEffect(() => {
-    if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setUserBalance((Number(userBalance) / 1e18).toFixed(2))
+    refetch()
+    if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setUserBalance((Number(balance) / 1e6).toFixed(2))
   }, [address, balance, selectedChains?.from])
 
   useEffect(() => {
