@@ -91,6 +91,12 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
         }
     }
 
+    const clear = () => {
+        setTimedOut(() => false)
+        setSuccess(() => false)
+        setToAddress(() => "")
+    }
+
     useEffect(() => {
         if (open) {
             if (checkData?.exists && checkData?.confirmed) {
@@ -163,7 +169,10 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                                 <Button className="h-[74px] bg-white w-full font-medium text-[18px]" onClick={check}>
                                     Check payment
                                 </Button>
-                                <Button onClick={cancel} className="h-[74px] bg-secondary text-red-500 w-full font-medium text-[18px]">
+                                <Button onClick={() => {
+                                    clear()
+                                    cancel()
+                                }} className="h-[74px] bg-secondary text-red-500 w-full font-medium text-[18px]">
                                     Cancel
                                 </Button>
                             </div>
@@ -175,9 +184,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                 <div className="flex flex-col gap-10 max-w-full">
                     <Image src={SuccessIcon} alt="" className="w-[200px] h-[200px] sm:w-[400px] sm:h-[400px]" />
                     <Button onClick={() => {
-                        setTimedOut(() => false)
-                        setSuccess(() => false)
-                        setToAddress(() => "")
+                        clear()
                         onClose()
                     }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK
@@ -190,9 +197,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                 <div className="flex flex-col gap-10 max-w-full">
                     <Image src={ErrorIcon} alt="" className="w-[200px] h-[200px] sm:w-[400px] sm:h-[400px]" />
                     <Button onClick={() => {
-                        setTimedOut(() => false)
-                        setSuccess(() => false)
-                        setToAddress(() => "")
+                        clear()
                         onClose()
                     }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK
