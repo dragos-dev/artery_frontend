@@ -61,6 +61,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
 
             toast.success("Транзакция отправлена. Ждите подтверждения.")
         } catch (e) {
+            console.log(e)
             toast.error("Error")
         }
 
