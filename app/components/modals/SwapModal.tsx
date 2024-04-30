@@ -94,7 +94,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                 toast.error("Еще не поступило переводов, ожидайте.")
             }
         }
-    }, [checkData])
+    }, [checkData?.exists])
 
     return <Modal 
         isOpen={open} 
