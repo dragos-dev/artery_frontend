@@ -1,4 +1,4 @@
-import { StaticImport } from "next"
+import { StaticImageData } from "next/image"
 
 export enum Chains {
     ARTR = "ARTR",
@@ -14,7 +14,7 @@ export type Chain = {
     name: string,
     network: Chains,
     token: string,
-    icon: StaticImport
+    icon: StaticImageData
 }
 
 interface ActibeBridge {
