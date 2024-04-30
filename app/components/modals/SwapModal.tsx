@@ -46,10 +46,8 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     }, [address, open])
 
     useEffect(() => {
-        if (!info?.activeBridge) return
-        
-        const chainFrom = chains.find(e => e.network == info.activeBridge.chains.from)
-        const chainTo = chains.find(e => e.network == info.activeBridge.chains.to)
+        const chainFrom = chains.find(e => e.network == info?.activeBridge?.chains?.from)
+        const chainTo = chains.find(e => e.network == info?.activeBridge?.chains?.to)
 
         if (!(chainFrom && chainTo)) return
 
