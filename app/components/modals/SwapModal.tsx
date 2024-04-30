@@ -104,7 +104,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             } else {
                 if (toastAvailable) toast.error("Еще не поступило переводов, ожидайте.")
                 setToastAvailable(() => false)
-                setTimeout(() => setToastAvailable(() => true), 1_000)
+                setTimeout(() => setToastAvailable(() => true), 2_000)
             }
         }
     }, [checkData?.exists])
