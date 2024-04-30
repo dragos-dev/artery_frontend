@@ -44,7 +44,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const [toastAvailable, setToastAvailable] = useState(true)
 
     useEffect(() => {
-        if (evmChains.includes(chains?.[selectedChains?.from]?.network)) {
+        if (evmChains.includes(chains?.[selectedChains?.to]?.network)) {
             console.log(address)
             setToAddress(() => address as `0x${string}`)
         }
@@ -128,7 +128,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
       {() => (
         <div className="relative">
           <div className="sm:hidden absolute left-0 right-0 mx-auto top-[-14px] w-[40px] h-[6px] bg-white rounded-[4px]"></div>
-            {!success ? <>
+            {!timedOut ? <>
                 <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Write address for sending</ModalHeader>
                 <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                     <div className="flex flex-col gap-[12px] max-w-full">
@@ -178,7 +178,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                             </div>
                         </div>
                 </ModalBody>
-            </> : !timedOut ? <>
+            </> : success ? <>
             <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Успешно! Свап выполнен</ModalHeader>
             <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                 <div className="flex flex-col gap-10 max-w-full">
