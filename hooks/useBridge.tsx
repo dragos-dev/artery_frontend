@@ -34,6 +34,10 @@ export const useBridge = () => {
                         timeForOut: 1000 * 60 * 30,
                         timeForEnd: new Date().getTime() + 1000 * 60 * 30,
                         amount: res.amount,
+                        chains: {
+                            from: chains[selectedChains.from].network,
+                            to: chains[selectedChains.to].network
+                        }
                     },
                     feePerTransfer: prev?.feePerTransfer ?? 0
                 }))
