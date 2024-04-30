@@ -44,7 +44,10 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const [toastAvailable, setToastAvailable] = useState(true)
 
     useEffect(() => {
-        if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setToAddress(() => address as `0x${string}`)
+        if (evmChains.includes(chains?.[selectedChains?.from]?.network)) {
+            console.log(address)
+            setToAddress(() => address as `0x${string}`)
+        }
     }, [address])
 
     useEffect(() => {
@@ -174,6 +177,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                     <Button onClick={() => {
                         setTimedOut(() => false)
                         setSuccess(() => false)
+                        setToAddress(() => "")
                         onClose()
                     }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK
@@ -188,6 +192,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                     <Button onClick={() => {
                         setTimedOut(() => false)
                         setSuccess(() => false)
+                        setToAddress(() => "")
                         onClose()
                     }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK

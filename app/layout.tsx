@@ -10,13 +10,7 @@ import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  }
-});
+const queryClient = new QueryClient();
 
 export default function RootLayout({
   children,
