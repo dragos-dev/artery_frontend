@@ -121,7 +121,7 @@ export default function Home() {
 
       <div className="display flex gap-4">
         <Image src={NotificationIcon} alt="Notification" />
-        <p className="text-[18px] text-center">Transfer from/to Polygon zkEVM is temporarily paused due to the planned network infrastructure migration. Service will resume as soon as it is done.</p>
+        <p className="text-[18px] text-center">Transfer from/to TON is temporarily paused due to the planned network infrastructure migration. Service will resume as soon as it is done.</p>
       </div>
       <div className="w-full lg:px-[50px] flex gap-3 justify-between">
         <div className="flex-1 hidden lg:block"></div>
