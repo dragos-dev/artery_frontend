@@ -23,6 +23,10 @@ interface ActibeBridge {
     timeForEnd: number;
     depositAddress: string;
     amount: number;
+    chains: {
+        from: Chains;
+        to: Chains;
+    }
 }
 
 export interface Info {

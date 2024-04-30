@@ -12,7 +12,6 @@ import { useBridge } from "@/hooks/useBridge";
 import { useMe } from "@/hooks/useMe";
 import { useCheck } from "@/hooks/useCheck";
 import { CONTRACT_ADDRESS } from "@/lib/data";
-import { Chains } from "@/lib/types";
 import axios from "axios";
 import { $api } from "@/lib/axios";
 import Image from 'next/image';
@@ -36,7 +35,6 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
         functionName: 'transfer'
     })
     const {data: checkData, mutate: sendCheck} = useCheck()
-    const [bridging, setBridging] = useState(false)
     const [toAddress, setToAddress] = useState("")
     const { address } = useAccount()
     const [success, setSuccess] = useState(false)
@@ -44,11 +42,22 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const [toastAvailable, setToastAvailable] = useState(true)
 
     useEffect(() => {
-        if (evmChains.includes(chains?.[selectedChains?.to]?.network)) {
-            console.log(address)
-            setToAddress(() => address as `0x${string}`)
-        }
-    }, [address])
+        if (evmChains.includes(chains?.[selectedChains?.to]?.network)) setToAddress(() => address as `0x${string}`)
+    }, [address, open])
+
+    useEffect(() => {
+        if (!info?.activeBridge) return
+        
+        const chainFrom = chains.find(e => e.network == info.activeBridge.chains.from)
+        const chainTo = chains.find(e => e.network == info.activeBridge.chains.to)
+
+        if (!(chainFrom && chainTo)) return
+
+        setSelectedChains(() => ({
+            from: chains.indexOf(chainFrom),
+            to: chains.indexOf(chainTo),
+        }))
+    }, [info?.activeBridge?.chains?.from])
 
     useEffect(() => {
         if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0 && !success) {
@@ -57,7 +66,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             setTimedOut(() => true)
         }
         setLoading(() => false)
-    }, [info, open, bridging])
+    }, [info, open])
 
     const send = async() => {
         try {
@@ -104,7 +113,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             } else {
                 if (toastAvailable) toast.error("Еще не поступило переводов, ожидайте.")
                 setToastAvailable(() => false)
-                setTimeout(() => setToastAvailable(() => true), 2_000)
+                setTimeout(() => setToastAvailable(() => true), 5_000)
             }
         }
     }, [checkData?.exists])

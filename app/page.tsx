@@ -27,12 +27,13 @@ import { CONTRACT_ADDRESS, MIN_BRIDGE_SUM } from "@/lib/data";
 import { useBridge } from "@/hooks/useBridge";
 import * as abi from "@/public/abi/token.json"
 import SwapModalError from "./components/modals/SwapModalError";
+import { Chains } from "@/lib/types";
 
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
 
   const chainsModalOpen = useDisclosure()
-  const swapModalOpen = useDisclosure()
+  const swapModalOpen = useDisclosure() 
   const swapModalError = useDisclosure()
 
   const [selected, setSelected] = React.useState("transfer");
@@ -43,7 +44,7 @@ export default function Home() {
   const [selectingChain, setSelectingChain] = useState<"none" | "from" | "to">("none")
   const [info] = useAtom(infoAtom)
   const {mutate, isError, isSuccess} = useBridge()
-
+  const [hideFromMax, setHideFromMax] = useState(false)
   const {data: balance, refetch} = useContractRead({
     address: CONTRACT_ADDRESS,
     abi: Array.from(abi),
@@ -51,6 +52,10 @@ export default function Home() {
     args: [address],
     watch: true
   })
+
+  useEffect(() => {
+    setHideFromMax(() => chains[selectedChains?.to]?.network != Chains.ARTR)
+}, [selectedChains])
 
   useEffect(() => {
     if (isSuccess) swapModalOpen.onOpen()
@@ -186,7 +191,7 @@ export default function Home() {
                               }}
                               endContent={
                                 <div className="relative min-w-[70px] pointer-events-none flex items-center justify-end">
-                                  <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span>
+                                  {!hideFromMax ? <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span> : null}
                                   <span className="text-white text-small">{(evmChains.includes(chains[selectedChains.from].network) && userBalance) ? `${userBalance} ` : ``}{chains[selectedChains.from].token}</span>
                                 </div>
                               }
@@ -234,7 +239,7 @@ export default function Home() {
                                 }}
                                 endContent={
                                   <div className="relative w-[70px] pointer-events-none flex items-center justify-end">
-                                    <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span>
+                                    {/* <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span> */}
                                     <span className="text-white text-small">{chains[selectedChains.to].token}</span>
                                   </div>
                                 }

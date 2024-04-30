@@ -1,5 +1,5 @@
 import { AuthenticationStatus } from "@rainbow-me/rainbowkit";
-import { Info, SelectedChains } from "./types.d"
+import { Info, SelectedChains } from "./types"
 import { atom } from "jotai";
 
 export const authenticatedStatusAtom = atom<AuthenticationStatus | null>(null);

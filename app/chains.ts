@@ -1,4 +1,4 @@
-import { Chain, Chains } from "../lib/types.d";
+import { Chain, Chains } from "../lib/types";
 import BNBChainIcon from "@/public/bnb-chain-binance-smart-chain-logo 1.svg"
 import ArteryIcon from "@/public/artery.svg"
 
