@@ -88,7 +88,7 @@ export default function Home() {
 
   const addToken = async() => {
     const tokenSymbol = 'WARTR';
-    const tokenDecimals = 18;
+    const tokenDecimals = 6;
     
     if (!('ethereum' in window)) return
 
