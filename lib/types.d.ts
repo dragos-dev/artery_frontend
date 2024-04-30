@@ -29,6 +29,7 @@ export interface Info {
     commission: number;
     activeBridge?: ActibeBridge;
     maxAmount: number;
+    feePerTransfer: number;
 }
 
 export interface RequestBridge {

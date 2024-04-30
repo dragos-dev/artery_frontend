@@ -26,12 +26,14 @@ import toast from "react-hot-toast";
 import { CONTRACT_ADDRESS, MIN_BRIDGE_SUM } from "@/lib/data";
 import { useBridge } from "@/hooks/useBridge";
 import * as abi from "@/public/abi/token.json"
+import SwapModalError from "./components/modals/SwapModalError";
 
 export default function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
 
   const chainsModalOpen = useDisclosure()
   const swapModalOpen = useDisclosure()
+  const swapModalError = useDisclosure()
 
   const [selected, setSelected] = React.useState("transfer");
   const { isConnected, address } = useAccount();
@@ -40,13 +42,21 @@ export default function Home() {
   const [selectedChains, setSelectedChains] = useAtom(selectedChainsStatusAtom)
   const [selectingChain, setSelectingChain] = useState<"none" | "from" | "to">("none")
   const [info] = useAtom(infoAtom)
-  const {mutate} = useBridge()
+  const {mutate, isError, isSuccess} = useBridge()
 
   const {data: balance} = useContractRead({
     abi,
     functionName: 'balanceOf',
     args: [address]
   })
+
+  useEffect(() => {
+    if (isSuccess) swapModalOpen.onOpen()
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (isError) swapModalError.onOpen()
+  }, [isError])
 
   const [swapAmountFrom, setSwapAmountFrom] = useState(0)
   const [swapAmountTo, setSwapAmountTo]  = useState(0)
@@ -58,7 +68,7 @@ export default function Home() {
   }, [address, balance, selectedChains?.from])
 
   useEffect(() => {
-    setSwapAmountTo(() => info?.commission !== undefined ? (swapAmountFrom > info.commission ? Number((swapAmountFrom - info.commission).toFixed(2)) : 0) : 0)
+    setSwapAmountTo(() => info?.commission !== undefined ? (swapAmountFrom > info.commission ? Number((swapAmountFrom - info.commission - (swapAmountFrom * 5 / 1e3)).toFixed(2)) : 0) : 0)
   }, [swapAmountFrom])
   
   useEffect(() => {console.log(selectedChains)}, [authenticated, selectedChains.from, selectedChains.to])
@@ -103,6 +113,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center p-4 gap-4 sm:gap-10">
       <ChainsModal open={chainsModalOpen.isOpen} onClose={chainsModalOpen.onClose} onSwitch={onSwitch} selectingChain={selectingChain} setSelectingChain={setSelectingChain} />
       <SwapModal open={swapModalOpen.isOpen} onClose={swapModalOpen.onClose} amount={swapAmountFrom} />
+      <SwapModalError open={swapModalError.isOpen} onClose={swapModalError.onClose} />
 
       <div className="display flex gap-4">
         <Image src={NotificationIcon} alt="Notification" />
@@ -170,8 +181,8 @@ export default function Home() {
                               }}
                               endContent={
                                 <div className="relative w-[70px] pointer-events-none flex items-center justify-end">
-                                  <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ?? "..."}</span>
-                                  <span className="text-white text-small">{userBalance ? `${userBalance} ` : ``}{chains[selectedChains.from].token}</span>
+                                  <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span>
+                                  <span className="text-white text-small">{(evmChains.includes(chains[selectedChains.from].network) && userBalance) ? `${userBalance} ` : ``}{chains[selectedChains.from].token}</span>
                                 </div>
                               }
                             />
@@ -205,7 +216,7 @@ export default function Home() {
                           <div className="bg-secondary pt-5 rounded-[12px]">
                               <Input
                                 type="number"
-                                label="Send:"
+                                label="Receive:"
                                 placeholder="0.00"
                                 value={swapAmountTo ? swapAmountTo.toString() : ""}
                                 disabled
@@ -218,7 +229,7 @@ export default function Home() {
                                 }}
                                 endContent={
                                   <div className="relative w-[70px] pointer-events-none flex items-center justify-end">
-                                    <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ?? "..."}</span>
+                                    <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span>
                                     <span className="text-white text-small">{chains[selectedChains.to].token}</span>
                                   </div>
                                 }
@@ -234,7 +245,6 @@ export default function Home() {
                               toast.error(`Минимальная сумма бриджа - ${MIN_BRIDGE_SUM}`) 
                             } else {
                               mutate(swapAmountFrom)
-                              swapModalOpen.onOpen()
                             }
                           }
                         }}>
