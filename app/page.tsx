@@ -65,6 +65,9 @@ export default function Home() {
 
   useEffect(() => {
     refetch()
+  }, [address])
+
+  useEffect(() => {
     if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setUserBalance((Number(balance) / 1e6).toFixed(2))
   }, [address, balance, selectedChains?.from])
 

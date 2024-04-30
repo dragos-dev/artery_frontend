@@ -57,7 +57,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
 
     const send = async() => {
         try {
-            const transaction = await writeAsync({ args: [info?.activeBridge?.depositAddress, (info?.activeBridge?.amount ?? amount) * 1e18] })
+            const transaction = await writeAsync({ args: [info?.activeBridge?.depositAddress, (info?.activeBridge?.amount ?? amount) * 1e6] })
 
             toast.success("Транзакция отправлена. Ждите подтверждения.")
         } catch (e) {
