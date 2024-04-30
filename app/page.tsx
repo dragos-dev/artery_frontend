@@ -45,9 +45,11 @@ export default function Home() {
   const {mutate, isError, isSuccess} = useBridge()
 
   const {data: balance, refetch} = useContractRead({
-    abi,
+    address: CONTRACT_ADDRESS,
+    abi: Array.from(abi),
     functionName: 'balanceOf',
-    args: [address]
+    args: [address],
+    watch: true
   })
 
   useEffect(() => {
@@ -64,11 +66,10 @@ export default function Home() {
   const [userBalance, setUserBalance] = useState("")
 
   useEffect(() => {
-    refetch()
-  }, [address])
-
-  useEffect(() => {
-    if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setUserBalance((Number(balance) / 1e6).toFixed(2))
+    if (evmChains.includes(chains?.[selectedChains?.from]?.network)) {
+      const value = (Number(balance) / 1e6).toFixed(0)
+      setUserBalance(() => !isNaN(Number(value)) ? `${value}` : "")
+    }
   }, [address, balance, selectedChains?.from])
 
   useEffect(() => {
@@ -184,7 +185,7 @@ export default function Home() {
                                 inputWrapper: "bg-transparent px-5 data-[hover=true]:bg-transparent group-data-[focus=true]:bg-transparent"
                               }}
                               endContent={
-                                <div className="relative w-[70px] pointer-events-none flex items-center justify-end">
+                                <div className="relative min-w-[70px] pointer-events-none flex items-center justify-end">
                                   <span className="absolute top-[-38px] text-[14px] text-third truncate">Max: {info?.maxAmount ? Math.floor(info.maxAmount) : "..."}</span>
                                   <span className="text-white text-small">{(evmChains.includes(chains[selectedChains.from].network) && userBalance) ? `${userBalance} ` : ``}{chains[selectedChains.from].token}</span>
                                 </div>

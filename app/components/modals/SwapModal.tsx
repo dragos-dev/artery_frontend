@@ -41,6 +41,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     const { address } = useAccount()
     const [success, setSuccess] = useState(false)
     const [timedOut, setTimedOut] = useState(false)
+    const [toastAvailable, setToastAvailable] = useState(true)
 
     useEffect(() => {
         if (evmChains.includes(chains?.[selectedChains?.from]?.network)) setToAddress(() => address as `0x${string}`)
@@ -92,9 +93,15 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             if (checkData?.exists && checkData?.confirmed) {
                 setSuccess(() => true)
             } else {
-                toast.error("Еще не поступило переводов, ожидайте.")
+                if (toastAvailable) toast.error("Еще не поступило переводов, ожидайте.")
+                setToastAvailable(() => false)
+                setTimeout(() => setToastAvailable(() => true), 1_000)
             }
         }
+    }, [checkData?.exists])
+
+    useEffect(() => {
+        console.log(checkData)
     }, [checkData?.exists])
 
     return <Modal 
