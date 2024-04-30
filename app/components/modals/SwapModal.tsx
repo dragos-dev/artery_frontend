@@ -100,12 +100,10 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
         }
     }, [checkData?.exists])
 
-    useEffect(() => {
-        console.log(checkData)
-    }, [checkData?.exists])
-
     return <Modal 
         isOpen={open} 
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
         placement={"bottom-center"}
         classNames={{
         closeButton: "hidden sm:block z-[1]",
@@ -173,7 +171,11 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                 <div className="flex flex-col gap-10 max-w-full">
                     <Image src={SuccessIcon} alt="" className="w-[200px] h-[200px] sm:w-[400px] sm:h-[400px]" />
-                    <Button onClick={onClose} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
+                    <Button onClick={() => {
+                        setTimedOut(() => false)
+                        setSuccess(() => false)
+                        onClose()
+                    }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK
                     </Button>
                 </div>
@@ -183,7 +185,11 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
             <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                 <div className="flex flex-col gap-10 max-w-full">
                     <Image src={ErrorIcon} alt="" className="w-[200px] h-[200px] sm:w-[400px] sm:h-[400px]" />
-                    <Button onClick={onClose} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
+                    <Button onClick={() => {
+                        setTimedOut(() => false)
+                        setSuccess(() => false)
+                        onClose()
+                    }} className="h-[74px] bg-white text-secondary w-full font-medium text-[18px]">
                         OK
                     </Button>
                 </div>
