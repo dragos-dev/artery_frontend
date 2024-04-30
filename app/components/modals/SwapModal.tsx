@@ -51,7 +51,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
     }, [address])
 
     useEffect(() => {
-        if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0) {
+        if (info?.activeBridge?.timeForOut && info.activeBridge.timeForOut < 0 && !success) {
             // toast.error("Время истекло")
             // onClose()
             setTimedOut(() => true)
@@ -128,7 +128,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
       {() => (
         <div className="relative">
           <div className="sm:hidden absolute left-0 right-0 mx-auto top-[-14px] w-[40px] h-[6px] bg-white rounded-[4px]"></div>
-            {!timedOut ? <>
+            {(!timedOut && !success) ? <>
                 <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Write address for sending</ModalHeader>
                 <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                     <div className="flex flex-col gap-[12px] max-w-full">
@@ -178,7 +178,8 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                             </div>
                         </div>
                 </ModalBody>
-            </> : success ? <>
+            </> : null}
+            {success ? <>
             <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Успешно! Свап выполнен</ModalHeader>
             <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                 <div className="flex flex-col gap-10 max-w-full">
@@ -191,7 +192,8 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                     </Button>
                 </div>
             </ModalBody>
-            </> : <>
+            </> : null} 
+            {timedOut ? <>
             <ModalHeader className="flex flex-col gap-1 text-2xl text-center">Ошибка! Превышено время ожидания</ModalHeader>
             <ModalBody className="flex flex-col items-center justify-center gap-8 p-8 max-w-[496px] mx-auto">
                 <div className="flex flex-col gap-10 max-w-full">
@@ -204,7 +206,7 @@ const SwapModal = ({ open, onClose, amount }: ISwapModalProps) => {
                     </Button>
                 </div>
             </ModalBody>
-            </>}
+            </> : null}
         </div>)}
     </ModalContent>
   </Modal>
