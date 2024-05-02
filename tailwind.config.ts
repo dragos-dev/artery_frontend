@@ -14,7 +14,8 @@ const config: Config = {
         primary: "#181818",
         secondary: "#1D1C1E",
         third: "#656565",
-        white: "#ffffff"
+        white: "#ffffff",
+        purple: "#9A6AFF"
       }
     },
   },

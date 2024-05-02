@@ -27,9 +27,10 @@ import { CONTRACT_ADDRESS, MIN_BRIDGE_SUM } from "@/lib/data";
 import { useBridge } from "@/hooks/useBridge";
 import * as abi from "@/public/abi/token.json"
 import SwapModalError from "./components/modals/SwapModalError";
-import { Chains } from "@/lib/types";
+import { Chains, HistoryBridge } from "@/lib/types";
+import { $api } from "@/lib/axios";
 
-export default function Home() {
+function Home() {
   const [authenticated] = useAtom(authenticatedStatusAtom)
 
   const chainsModalOpen = useDisclosure()
@@ -119,6 +120,18 @@ export default function Home() {
     }
   }
 
+  const [bridges, setBridges] = useState<HistoryBridge[]>([])
+
+  const getBridges = async() => {
+    const res = (await $api.get("/bridge")).data
+
+    console.log(res)
+
+    if (!res) return
+
+    setBridges(() => res)
+  } 
+
   return (
     <main className="flex min-h-screen flex-col items-center p-4 gap-4 sm:gap-10">
       <ChainsModal open={chainsModalOpen.isOpen} onClose={chainsModalOpen.onClose} onSwitch={onSwitch} selectingChain={selectingChain} setSelectingChain={setSelectingChain} />
@@ -148,7 +161,7 @@ export default function Home() {
               >
                 <Tab key="transfer" title="Transfer">
                   <Card className="max-w-full bg-transparent lg:bg-primary w-full lg:w-[545px] min-h-[400px]">
-                    <CardBody className="flex flex-col items-center text-white overflow-hidden gap-5 min-h-full p-6">
+                    <CardBody className="flex flex-col items-center text-white overflow-hidden gap-5 min-h-full p-0 lg:p-6">
                         <Button className="w-full bg-secondary font-medium text-white text-[18px] p-10" onClick={addToken}>
                           Add WARTR Token
                         </Button>
@@ -176,6 +189,7 @@ export default function Home() {
                               type="number"
                               label="Send:"
                               placeholder="0.00"
+                              disabled={!isConnected}
                               value={swapAmountFrom ? swapAmountFrom.toString() : ""}
                               onChange={e => {
                                   const value = Number(e.target.value)
@@ -248,7 +262,7 @@ export default function Home() {
                         </div>
                         
                         <Button className="w-full bg-white font-medium text-[18px] p-10" onClick={() => {
-                           if ((!isConnected || localStorage.getItem('token')) && openConnectModal) {
+                           if ((!isConnected || !localStorage.getItem('token')) && openConnectModal) {
                             openConnectModal()
                           } else {
                             if (swapAmountFrom < MIN_BRIDGE_SUM) {
@@ -266,18 +280,62 @@ export default function Home() {
                 <Tab key="liquidity" title="Liquidity">
                   
                 </Tab>
-                <Tab key="history" className="lg:hidden w-[110px]" title={<Image src={selected == 'history' ? HistoryIcon : HistoryLightIcon} alt="History" />}>
-                  
+                <Tab key="history" title="History">
+                <Card className="flex flex-col gap-6 max-w-full bg-transparent lg:bg-primary w-full lg:w-[461px] lg:p-6">
+                    {bridges?.length ? bridges.map(bridge => <CardBody className="flex flex-col items-center text-white bg-secondary rounded-[16px] overflow-hidden gap-5 flex-1">
+                        <h1 className="font-semibold text-[20px] opacity-70">Свап</h1>
+                        <div className="flex flex-col gap-4 w-full">
+                          <div className="flex justify-between w-full gap-4">
+                            <span>
+                              Из
+                            </span>
+                            <div className="flex gap-[10px]">
+                              <Image src={chains?.find(el => el.network == bridge.chain_from)?.icon ?? ""} alt="chain" />
+                              <span>{chains?.find(el => el.network == bridge.chain_from)?.name}</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between w-full gap-4">
+                            <span>
+                              В
+                            </span>
+                            <div className="flex gap-[10px]">
+                              <Image src={chains?.find(el => el.network == bridge.chain_to)?.icon ?? ""} alt="chain" />
+                              <span>{chains?.find(el => el.network == bridge.chain_to)?.name}</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between w-full gap-4">
+                            <span>
+                              Сумма
+                            </span>
+                            <span>
+                              {bridge.amount} ARTR
+                            </span>
+                          </div>
+                          <div className="flex justify-end">
+                            <span className="text-[12px] text-purple">{new Date(bridge.timestamp).toDateString()}</span>
+                          </div>
+                        </div>
+                    </CardBody>) : null}
+                  </Card>
                 </Tab>
               </Tabs>
         </div>
         <div className="hidden lg:flex flex-1 justify-end gap-3">
-            <Button className="flex place-items-center font-medium text-[18px] gap-[10px] text-white bg-primary p-6">
-              <Image src={HistoryLightIcon} alt="History" />
+            <Button 
+              className={`flex place-items-center font-medium text-[18px] gap-[10px] text-white bg-primary p-6 ${selected == 'history' ? "bg-white text-secondary" : ""}`} 
+              onClick={() => {
+                if ((!isConnected || !localStorage.getItem('token')) && openConnectModal) {
+                  openConnectModal()
+                } else {
+                  getBridges()
+                  setSelected(() => "history")
+                }
+              }}>
+              <Image src={selected == 'history' ? HistoryIcon : HistoryLightIcon} alt="History" />  
               History
             </Button>
             <Button className="flex place-items-center font-medium text-[18px] text-primary bg-white p-6" onClick={() => {
-                if ((!isConnected || localStorage.getItem('token')) && openConnectModal) {
+                if ((!isConnected || !localStorage.getItem('token')) && openConnectModal) {
                   openConnectModal()
                 } else if (openAccountModal) {
                   openAccountModal()
@@ -309,3 +367,5 @@ export default function Home() {
     </main>
   );
 }
+
+export default Home;

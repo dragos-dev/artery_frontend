@@ -10,6 +10,7 @@ const AuthProvider = () => {
     const {refetch} = useMe()
   
     useEffect(() => {
+      console.log(authenticated, isConnected, localStorage.getItem('token'))
       if (isConnected && localStorage.getItem('token')) {
         setAuthenticated('authenticated')
         refetch()

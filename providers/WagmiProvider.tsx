@@ -26,8 +26,8 @@ const connectors = connectorsForWallets([
 	{
 		groupName: "Artery Most",
 		wallets: [
-			trustWallet({ projectId, chains, shimDisconnect: true }),
-			metaMaskWallet({ projectId, chains, shimDisconnect: true })
+			trustWallet({ projectId, chains, shimDisconnect: false }),
+			metaMaskWallet({ projectId, chains, shimDisconnect: false })
 		],
 	}
 ]);

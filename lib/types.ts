@@ -17,6 +17,13 @@ export type Chain = {
     icon: StaticImageData
 }
 
+export type HistoryBridge = {
+    chain_from: Chains,
+    chain_to: Chains,
+    amount: number,
+    timestamp: Date
+}
+
 interface ActibeBridge {
     id: number;
     timeForOut: number;
