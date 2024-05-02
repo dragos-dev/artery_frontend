@@ -282,7 +282,7 @@ function Home() {
                 </Tab>
                 <Tab key="history" title="History">
                 <Card className="flex flex-col gap-6 max-w-full bg-transparent lg:bg-primary w-full lg:w-[461px] lg:p-6">
-                    {bridges?.length ? bridges.map(bridge => <CardBody className="flex flex-col items-center text-white bg-secondary rounded-[16px] overflow-hidden gap-5 flex-1">
+                    {bridges?.length ? bridges.map((bridge, index) => <CardBody key={index} className="flex flex-col items-center text-white bg-secondary rounded-[16px] overflow-hidden gap-5 flex-1">
                         <h1 className="font-semibold text-[20px] opacity-70">Свап</h1>
                         <div className="flex flex-col gap-4 w-full">
                           <div className="flex justify-between w-full gap-4">
